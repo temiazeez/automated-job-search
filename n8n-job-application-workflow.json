@@ -1,0 +1,886 @@
+{
+  "name": "Bolaji Job Applications - Expanded v2 (stage-specific)",
+  "nodes": [
+    {
+      "id": "schedule",
+      "name": "Every day at 10 AM Lagos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 10 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "manual",
+      "name": "Run manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        180
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "config",
+      "name": "Load local settings",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        90
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{workerUrl:\"http://host.docker.internal:8080\", provider:\"ollama\"}}];"
+      }
+    },
+    {
+      "id": "start",
+      "name": "Start daily queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        90
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/start' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {provider: $('Load local settings').first().json.provider, mode: 'expanded'} }}",
+        "options": {
+          "timeout": 660000
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-1",
+      "name": "Collect Sheet Inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/discover' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {source: 'Inbox'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-2",
+      "name": "Read Gmail Job Alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1170,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/discover' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {source: 'Alerts'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-3",
+      "name": "Search Remotive",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/discover' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {source: 'Remotive'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-4",
+      "name": "Search Jobicy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1750,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/discover' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {source: 'Jobicy'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-5",
+      "name": "Search Himalayas: n8n",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        180
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/discover' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {queries: ['n8n', 'workflow automation'], source: 'Himalayas'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-6",
+      "name": "Search Himalayas: AI automation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1170,
+        180
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/discover' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {queries: ['AI automation', 'automation specialist'], source: 'Himalayas'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-7",
+      "name": "Search Himalayas: social media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        180
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/discover' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {queries: ['social media', 'content creator', 'digital marketing'], source: 'Himalayas'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-8",
+      "name": "Normalize and remove duplicates",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1750,
+        180
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/source-next' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-9",
+      "name": "Check role and remote eligibility",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        360
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/status' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-10",
+      "name": "Select truthful CV facts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1170,
+        360
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/profile-check' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-11",
+      "name": "Tailor CV with Ollama",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        360
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/process-stage' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {mode: 'initial', stage: 'select'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-12",
+      "name": "Estimate ATS match",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1750,
+        360
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/process-stage' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {stage: 'assess'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-13",
+      "name": "Rewrite CV when below 80",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        540
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/process-stage' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {mode: 'rewrite', stage: 'select'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-14",
+      "name": "Render PDF and upload to Drive",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1170,
+        540
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/process-stage' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {stage: 'render'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-15",
+      "name": "Review application route",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        540
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/status' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-16",
+      "name": "Send verified Gmail fallback",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1750,
+        540
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/process-stage' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ {stage: 'send'} }}"
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-17",
+      "name": "Update Google Sheets tracker",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        720
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/sync' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "tick-18",
+      "name": "Refresh queue status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1170,
+        720
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Load local settings').first().json.workerUrl + '/status' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 660000
+        }
+      },
+      "credentials": {}
+    },
+    {
+      "id": "more",
+      "name": "More queued work?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2050,
+        900
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "continue",
+              "leftValue": "={{ $json.continue }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "wait",
+      "name": "Pace requests",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2350,
+        850
+      ],
+      "parameters": {
+        "amount": 10
+      }
+    },
+    {
+      "id": "summary",
+      "name": "Run summary",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2350,
+        1050
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "sources",
+      "name": "Sources",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        820,
+        -180
+      ],
+      "parameters": {
+        "width": 900,
+        "height": 130,
+        "content": "## All job platforms\nAutomatic free feeds: Himalayas, Remotive and Jobicy. Gmail Job Alerts + Sheet Inbox capture exact links from LinkedIn, Indeed, Glassdoor, Google Jobs, Mercor, Turing, Micro1 and any other platform. Start daily queue refreshes the clickable Sources sheet every run. Unsupported on-site applications remain Manual application with their job URL and tailored CV link.",
+        "color": 5
+      }
+    },
+    {
+      "id": "quality",
+      "name": "CV and ATS",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        300
+      ],
+      "parameters": {
+        "width": 900,
+        "height": 140,
+        "content": "## CV and ATS\nThe profile check exposes only fact counts. Tailoring, ATS assessment, up to three truthful rewrites, PDF rendering and Drive upload run as separate worker stages.",
+        "color": 5
+      }
+    },
+    {
+      "id": "apply",
+      "name": "Application routes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        700
+      ],
+      "parameters": {
+        "width": 900,
+        "height": 140,
+        "content": "## Application routes\nThe render stage decides the route. A verified employer address can use the Gmail fallback when submission is enabled. Platforms without an approved submission connection remain Manual application, and Sheets keeps the exact job link plus the tailored CV link.",
+        "color": 5
+      }
+    },
+    {
+      "id": "tracker",
+      "name": "Tracking",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        900,
+        1050
+      ],
+      "parameters": {
+        "width": 900,
+        "height": 130,
+        "content": "## Tracking\nEvery job is written to Google Sheets with its description, status, score, direct link, and tailored CV Drive link.",
+        "color": 5
+      }
+    },
+    {
+      "id": "debug",
+      "name": "Troubleshooting",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1050
+      ],
+      "parameters": {
+        "width": 800,
+        "height": 130,
+        "content": "## Troubleshooting\nClick the last failed node. Its output states the worker action, source, job id, current stage, and reason.",
+        "color": 5
+      }
+    }
+  ],
+  "connections": {
+    "Every day at 10 AM Lagos": {
+      "main": [
+        [
+          {
+            "node": "Load local settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run manually": {
+      "main": [
+        [
+          {
+            "node": "Load local settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load local settings": {
+      "main": [
+        [
+          {
+            "node": "Start daily queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start daily queue": {
+      "main": [
+        [
+          {
+            "node": "Collect Sheet Inbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Sheet Inbox": {
+      "main": [
+        [
+          {
+            "node": "Read Gmail Job Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Gmail Job Alerts": {
+      "main": [
+        [
+          {
+            "node": "Search Remotive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Remotive": {
+      "main": [
+        [
+          {
+            "node": "Search Jobicy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Jobicy": {
+      "main": [
+        [
+          {
+            "node": "Search Himalayas: n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Himalayas: n8n": {
+      "main": [
+        [
+          {
+            "node": "Search Himalayas: AI automation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Himalayas: AI automation": {
+      "main": [
+        [
+          {
+            "node": "Search Himalayas: social media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Himalayas: social media": {
+      "main": [
+        [
+          {
+            "node": "Normalize and remove duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize and remove duplicates": {
+      "main": [
+        [
+          {
+            "node": "Check role and remote eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check role and remote eligibility": {
+      "main": [
+        [
+          {
+            "node": "Select truthful CV facts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select truthful CV facts": {
+      "main": [
+        [
+          {
+            "node": "Tailor CV with Ollama",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tailor CV with Ollama": {
+      "main": [
+        [
+          {
+            "node": "Estimate ATS match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estimate ATS match": {
+      "main": [
+        [
+          {
+            "node": "Rewrite CV when below 80",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rewrite CV when below 80": {
+      "main": [
+        [
+          {
+            "node": "Render PDF and upload to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Render PDF and upload to Drive": {
+      "main": [
+        [
+          {
+            "node": "Review application route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send verified Gmail fallback": {
+      "main": [
+        [
+          {
+            "node": "Update Google Sheets tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Sheets tracker": {
+      "main": [
+        [
+          {
+            "node": "Refresh queue status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refresh queue status": {
+      "main": [
+        [
+          {
+            "node": "More queued work?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "More queued work?": {
+      "main": [
+        [
+          {
+            "node": "Pace requests",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Run summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pace requests": {
+      "main": [
+        [
+          {
+            "node": "Normalize and remove duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review application route": {
+      "main": [
+        [
+          {
+            "node": "Send verified Gmail fallback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "Africa/Lagos"
+  },
+  "pinData": {},
+  "tags": [],
+  "id": "B0lajiV2Stage25X"
+}

@@ -1,0 +1,14 @@
+# n8n and local credential exports
+*.sqlite
+*.db
+*.env
+secrets/
+credentials/
+oauth/
+
+# Generated documents and personal data
+*.pdf
+*.docx
+*.xlsx
+profile.json
+uploads/
